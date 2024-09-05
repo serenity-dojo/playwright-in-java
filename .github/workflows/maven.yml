@@ -42,3 +42,9 @@ jobs:
         with:
           name: failsafe-report
           path: target/failsafe-reports
+
+      - name: Publish Test Results
+        if: failure()  # Only publish annotations if the build fails
+        uses: mikepenz/action-junit-report@v3
+        with:
+          report_paths: '**/target/surefire-reports/*.xml'  # Path to JUnit XML report
