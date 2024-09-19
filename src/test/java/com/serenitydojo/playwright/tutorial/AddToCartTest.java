@@ -34,7 +34,6 @@ public class AddToCartTest extends PlaywrightBaseTest {
 
     @Test
     void shouldAddAnItemToTheCart() {
-
         catalogPage.addToCart("Sauce Labs Bolt T-Shirt");
         List<String> itemTitles = catalogPage.openShoppingCart().getItemTitles();
         Assertions.assertThat(itemTitles).contains("Sauce Labs Bolt T-Shirt");
