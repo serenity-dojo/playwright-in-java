@@ -2,23 +2,29 @@ package com.serenitydojo.playwright.tutorial;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.serenitydojo.playwright.tutorial.pageobjects.CartPage;
+import com.serenitydojo.playwright.tutorial.pageobjects.CatalogPage;
+import com.serenitydojo.playwright.tutorial.pageobjects.LoginPage;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
+
+import java.util.List;
 
 import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class AddToCartTest extends PlaywrightBaseTest {
 
     Page page;
+    CatalogPage catalogPage;
 
     @BeforeEach
-    void login() {
+    void setupPage() {
         page = browser.newPage();
+        LoginPage loginPage = new LoginPage(page);
+        this.catalogPage = new CatalogPage(page);
 
-        page.navigate("https://www.saucedemo.com/");
-
-        page.fill("#user-name","standard_user");
-        page.fill("#password","secret_sauce");
-        page.click("#login-button");
+        loginPage.open();
+        loginPage.login("standard_user","secret_sauce");
     }
 
     @AfterEach
@@ -28,21 +34,14 @@ public class AddToCartTest extends PlaywrightBaseTest {
 
     @Test
     void shouldAddAnItemToTheCart() {
-        login();
 
-        Locator productBlock = page.locator(".inventory_item:has-text('Sauce Labs Bolt T-Shirt')");
-        Locator addToCartButton = productBlock.locator("text=Add to cart");
-        addToCartButton.click();
-
-        page.click(".shopping_cart_badge");
-        Locator cartItem = page.locator(".cart_item");
-        assertThat(cartItem).isVisible();
-        assertThat(cartItem).containsText("Sauce Labs Bolt T-Shirt");
+        catalogPage.addToCart("Sauce Labs Bolt T-Shirt");
+        List<String> itemTitles = catalogPage.openShoppingCart().getItemTitles();
+        Assertions.assertThat(itemTitles).contains("Sauce Labs Bolt T-Shirt");
     }
 
     @Test
     void shouldAddTwoItemsToTheCart() {
-        login();
 
         Locator productBlock1 = page.locator(".inventory_item:has-text('Sauce Labs Bolt T-Shirt')");
         Locator addToCartButton1 = productBlock1.locator("text=Add to cart");
